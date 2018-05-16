@@ -1,0 +1,117 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"><label for="methodname">请求参数：</label></div>
+        <div class="col-md-4 text-left">
+            <input type="text" class="form-control" id="methodname" placeholder="请求参数">
+        </div>
+        <div class="col-md-6">
+            <button id="btnMethod" type="button" class="btn btn-primary">请求</button>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="margin-top: 60px">
+    <div class="row">
+        <div class="col-md-2"><label for="username">用户名：</label></div>
+        <div class="col-md-3 text-left">
+            <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+        </div>
+        <div class="col-md-2"><label for="password">密码：</label></div>
+        <div class="col-md-3 text-left">
+            <input type="password" class="form-control" id="password" placeholder="请输入密码">
+        </div>
+        <div class="col-md-2">
+            <button id="btnLogin" type="button" class="btn btn-danger">登录</button>
+            <input type="hidden" id="hidTicket"/>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts
+{
+    <script type="text/javascript">
+
+        $(function() {
+
+
+            $("#btnLogin").on("click",
+                function() {
+
+                    var loginData = {
+                        account: $("#username").val(),
+                        password: $("#password").val()
+                    };
+
+                    $.ajax({
+                        url: "/api/users/AccountLogin",
+                        type: "post",
+                        datatype: "json",
+                        data: loginData,
+                        success: function(data) {
+                            var result = JSON.parse(data);
+                            if (result.Result) {
+                                $("#hidTicket").val(result.Ticket);
+                                console.log(data);
+                            } else {
+                                alert("Filed");
+                            }
+                        }
+                    });
+
+                });
+
+            $("#btnMethod").on("click",
+                function() {
+
+                    var user = {
+                        id: 1,
+                        name: $("#methodname").val()
+                    };
+//
+//                    $.ajax({
+//                        url: "/api/users/Register",
+//                        type: "post",
+//                        datatype: "json",
+//                        data: JSON.stringify(user),
+//                        contentType: "application/json",
+//                        success: function (data) {
+//                            alert(data);
+//                            console.log(data);
+//                        }
+//                    });
+
+
+                    $.ajax({
+                        url: "/api/users/RegisterObject",
+                        type: "post",
+                        datatype: "json",
+                        data: {
+                            "User": user,
+                            "Info": "hello word"
+                        },
+                        beforeSend: function (xhr) {
+                            alert($("#hidTicket").val());
+                            xhr.setRequestHeader("Authorization", "BasicAuth " + $("#hidTicket").val());
+                            //XHR.setRequestHeader("Authorization", "BasicAuth " + $("#hidTicket").val());
+                        },
+                        success: function(data) {
+                            alert(data);
+                            console.log(data);
+                        }
+                    });
+                });
+        });
+
+    </script>
+
+
+}
+
